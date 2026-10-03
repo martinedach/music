@@ -6,44 +6,30 @@
   min-height: 100dvh;
   margin: 0 auto;
   padding: clamp(20px, 5vw, 48px) 16px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(18px, 4vw, 32px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: center;
+  row-gap: clamp(18px, 4vw, 32px);
+  isolation: isolate;
+  overflow: clip; /* keeps the lamp's light cone from stretching the page */
 }
 
 .main {
+  position: relative;
+  z-index: 2;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(18px, 4vw, 32px);
+  gap: clamp(14px, 3vw, 24px);
 }
 
 .header {
+  position: relative;
+  z-index: 3;
   text-align: center;
   max-width: 34ch;
-}
-
-/* Wide screens: the deck on the left, the record shelf standing beside it. */
-@media (min-width: 880px) {
-  .withShelf {
-    max-width: 1040px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(32px, 5vw, 72px);
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-  .withShelf .main {
-    width: min(560px, calc(100dvh - 260px));
-    flex: 0 1 auto;
-  }
-  .room:not(.withShelf) .main {
-    width: min(560px, calc(100dvh - 220px));
-  }
 }
 
 .eyebrow {
@@ -103,8 +89,433 @@
   border-radius: 4px;
 }
 
+/* ---- the lamp ---- */
+
+.lamp {
+  position: absolute;
+  top: -34px;
+  right: 2px;
+  width: 150px;
+  height: 130px;
+  z-index: 0;
+  pointer-events: none;
+  transform: scale(0.62);
+  transform-origin: 100% 0%;
+}
+.lampArm {
+  position: absolute;
+  left: 104px;
+  top: -90px;
+  width: 7px;
+  height: 140px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--brass-dark), var(--brass-light) 45%, var(--brass-dark));
+  transform: rotate(22deg);
+  transform-origin: 50% 0%;
+  box-shadow: -3px 4px 6px rgba(0, 0, 0, 0.5);
+}
+.lampShade {
+  position: absolute;
+  left: 14px;
+  top: 34px;
+  width: 124px;
+  height: 62px;
+  border-radius: 62px 62px 10px 10px;
+  background:
+    radial-gradient(70% 90% at 65% 20%, rgba(255, 240, 200, 0.5), transparent 55%),
+    linear-gradient(180deg, var(--brass-light) 0%, var(--brass) 45%, var(--brass-dark) 100%);
+  transform: rotate(-16deg);
+  transform-origin: 50% 50%;
+  box-shadow:
+    inset 0 -10px 18px rgba(255, 200, 120, 0.65),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    -6px 10px 16px rgba(0, 0, 0, 0.5);
+}
+.lampShade::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: -4px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 232, 180, 0.95), rgba(255, 200, 120, 0.4) 60%, transparent 75%);
+}
+.lampBulb {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 26px;
+  height: 14px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6dc, rgba(255, 220, 150, 0.6) 60%, transparent 75%);
+  filter: blur(1px);
+}
+/* cone of light leaving the shade, leaning down and to the left */
+.lampGlow {
+  position: absolute;
+  left: -224px;
+  top: 92px;
+  width: 600px;
+  height: 820px;
+  transform-origin: 50% 0%;
+  transform: rotate(24deg);
+  background: radial-gradient(
+    ellipse 50% 60% at 50% 0%,
+    color-mix(in srgb, var(--tint, #ffc87d) 30%, #ffc87d) 0%,
+    rgba(255, 190, 110, 0.5) 14%,
+    rgba(255, 170, 90, 0.18) 40%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  animation: flicker 11s steps(1, end) infinite;
+}
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  61% {
+    opacity: 0.52;
+  }
+  61.6% {
+    opacity: 0.7;
+  }
+  63% {
+    opacity: 0.6;
+  }
+  63.4% {
+    opacity: 0.7;
+  }
+  87% {
+    opacity: 0.63;
+  }
+  87.3% {
+    opacity: 0.7;
+  }
+}
+
+.motes {
+  position: absolute;
+  left: -190px;
+  top: 96px;
+  width: 400px;
+  height: 460px;
+  transform-origin: 50% 0%;
+  transform: rotate(24deg);
+  overflow: hidden;
+  -webkit-mask: radial-gradient(ellipse 45% 70% at 50% 10%, #000 20%, transparent 75%);
+  mask: radial-gradient(ellipse 45% 70% at 50% 10%, #000 20%, transparent 75%);
+}
+.motes i {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 236, 190, 0.9);
+  filter: blur(0.6px);
+  opacity: 0;
+  animation-name: mote;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes mote {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(14px, 26px);
+    opacity: 0.35;
+  }
+  75% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-10px, 52px);
+    opacity: 0;
+  }
+}
+
+/* ---- set dressing ---- */
+
+.props {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.coffeeRing {
+  position: absolute;
+  left: -30px;
+  bottom: 14%;
+  width: 96px;
+  height: 96px;
+  border-radius: 49% 51% 50% 50% / 50% 50% 52% 48%;
+  border: 3px solid rgba(70, 36, 12, 0.5);
+  box-shadow:
+    inset 0 0 0 2px rgba(70, 36, 12, 0.18),
+    inset 0 0 12px rgba(70, 36, 12, 0.25);
+  -webkit-mask: conic-gradient(from 20deg, #000 0 68%, transparent 68% 76%, #000 76% 100%);
+  mask: conic-gradient(from 20deg, #000 0 68%, transparent 68% 76%, #000 76% 100%);
+  transform: rotate(-12deg);
+}
+.cloth,
+.singles,
+.cable {
+  display: none;
+}
+
+/* ---- the leaning sleeve beside the deck ---- */
+
+.lean {
+  display: none;
+}
+
+/* ---- a record in flight between crate and platter ---- */
+
+.fly {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  border-radius: 50%;
+  will-change: transform;
+  background:
+    radial-gradient(circle, transparent 0 94.5%, rgba(0, 0, 0, 0.7) 94.8%, #080808 95.6%, #1c1c1c 100%),
+    repeating-radial-gradient(circle, #0a0a0a 0 1.3px, #1d1d1d 1.3px 2.6px);
+  box-shadow:
+    0 24px 40px -10px rgba(0, 0, 0, 0.8),
+    inset 0 0 3px rgba(255, 255, 255, 0.08);
+}
+.fly::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 20deg, rgba(255, 236, 200, 0.14) 46deg, transparent 80deg);
+}
+.flyLabel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-color: var(--cream-2);
+  box-shadow: inset 0 0 0 7% var(--sleeve-bg);
+}
+.flyLabel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #121212;
+}
+
+/* ---- wide screens: sleeve | deck | crate ---- */
+
+@media (min-width: 880px) {
+  .room {
+    max-width: 1280px;
+    grid-template-columns: minmax(200px, 1fr) minmax(0, auto) minmax(200px, 1fr);
+    align-items: center;
+    column-gap: clamp(20px, 3.5vw, 56px);
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  .main {
+    grid-column: 2;
+    width: min(560px, calc(100dvh - 330px));
+  }
+  .lean {
+    display: block;
+    grid-column: 1;
+    justify-self: end;
+    align-self: end;
+    margin-bottom: 6%;
+  }
+  .room > :global(section) {
+    grid-column: 3;
+    justify-self: start;
+  }
+  .lamp {
+    right: clamp(4px, 3vw, 60px);
+    top: -36px;
+    transform: none;
+  }
+
+  .cloth {
+    display: block;
+    position: absolute;
+    right: 2%;
+    bottom: 6%;
+    width: 150px;
+    height: 76px;
+    border-radius: 6px 10px 8px 12px;
+    background:
+      linear-gradient(100deg, rgba(0, 0, 0, 0.18), transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 52%, rgba(0, 0, 0, 0.2)),
+      linear-gradient(180deg, transparent 46%, rgba(0, 0, 0, 0.28) 48%, transparent 52%),
+      var(--mustard-dim);
+    box-shadow:
+      -8px 10px 16px -6px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: rotate(7deg);
+    opacity: 0.6;
+    filter: saturate(0.8) brightness(0.85);
+  }
+  .singles {
+    display: block;
+    position: absolute;
+    left: 4%;
+    top: 10%;
+    width: 110px;
+    height: 110px;
+  }
+  .singles i {
+    position: absolute;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, var(--burnt) 0 24%, #111 25% 26%, transparent 27%),
+      repeating-radial-gradient(circle, #0b0b0b 0 1px, #1c1c1c 1px 2px);
+    box-shadow: -4px 6px 10px -2px rgba(0, 0, 0, 0.7);
+  }
+  .singles i:nth-child(1) {
+    left: 0;
+    top: 16px;
+  }
+  .singles i:nth-child(2) {
+    left: 10px;
+    top: 6px;
+    background:
+      radial-gradient(circle, var(--mustard) 0 24%, #111 25% 26%, transparent 27%),
+      repeating-radial-gradient(circle, #0b0b0b 0 1px, #1c1c1c 1px 2px);
+  }
+  .singles i:nth-child(3) {
+    left: 18px;
+    top: -4px;
+    background:
+      radial-gradient(circle, var(--cream-2) 0 24%, #111 25% 26%, transparent 27%),
+      repeating-radial-gradient(circle, #0b0b0b 0 1px, #1c1c1c 1px 2px);
+  }
+  .cable {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    height: 220px;
+    opacity: 0.9;
+  }
+
+  .leanSleeve {
+    position: relative;
+    width: clamp(160px, 16vw, 220px);
+    aspect-ratio: 1;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: var(--sleeve-bg);
+    background-image: url("/textures/paper.svg");
+    background-size: 240px 240px;
+    transform: perspective(900px) rotateY(18deg) rotateZ(-3deg);
+    transform-origin: 100% 100%;
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+      inset -10px 0 14px -10px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      -14px 18px 26px -10px rgba(0, 0, 0, 0.8);
+    animation: fadeUp 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .leanSleeve::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.16), transparent 38%, rgba(0, 0, 0, 0.18));
+    pointer-events: none;
+  }
+  .leanCover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .leanArt {
+    position: absolute;
+    inset: 0;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--sleeve-ink);
+  }
+  .leanTitle {
+    font-family: var(--font-display), Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(20px, 2vw, 28px);
+    line-height: 1.05;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+  .leanArtist {
+    font-family: var(--font-type), "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .leanRing {
+    position: absolute;
+    right: -16%;
+    bottom: -16%;
+    width: 64%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+    opacity: 0.35;
+  }
+  .leanRing::after {
+    content: "";
+    position: absolute;
+    inset: 30%;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+  }
+  .leanShadow {
+    position: absolute;
+    left: -10%;
+    right: 10%;
+    bottom: -14px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.6), transparent 70%);
+    filter: blur(4px);
+    z-index: -1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .nowPlaying {
+  .nowPlaying,
+  .leanSleeve {
     animation: none;
+  }
+  .lampGlow {
+    animation: none;
+  }
+  .motes {
+    display: none;
   }
 }

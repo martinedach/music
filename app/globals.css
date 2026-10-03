@@ -55,7 +55,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Warm lamp from above, soft vignette at the edges. */
+/* Warm pool from the lamp at the top right, soft vignette at the edges,
+   breathing very slowly. */
 body::before {
   content: "";
   position: fixed;
@@ -63,8 +64,17 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(65% 50% at 50% -5%, rgba(255, 200, 125, 0.32), rgba(255, 170, 90, 0.08) 55%, transparent 80%),
-    radial-gradient(115% 85% at 50% 55%, transparent 38%, rgba(15, 8, 4, 0.5) 78%, rgba(8, 4, 2, 0.88) 100%);
+    radial-gradient(60% 55% at 78% -4%, rgba(255, 200, 125, 0.34), rgba(255, 170, 90, 0.1) 52%, transparent 78%),
+    radial-gradient(115% 85% at 55% 50%, transparent 36%, rgba(15, 8, 4, 0.5) 76%, rgba(8, 4, 2, 0.88) 100%);
+  animation: breathe 9s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  from {
+    opacity: 0.92;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Film grain over everything, gently shifting. */
@@ -113,6 +123,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body::before,
   body::after {
     animation: none;
   }

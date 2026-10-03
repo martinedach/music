@@ -10,45 +10,68 @@
   text-transform: uppercase;
   text-align: center;
   color: var(--cream-3);
-  margin: 0 0 18px;
+  margin: 0 0 12px;
   opacity: 0.85;
 }
 
-.row {
+/* ---- the crate (mobile first: a wide bin seen from the front) ---- */
+
+.crate {
+  position: relative;
+  padding: 0 6px;
+}
+
+.crateBack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28px;
+  bottom: 0;
+  border-radius: 5px;
+  background-color: var(--walnut-900);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.4)),
+    url("/textures/wood.svg");
+  background-size: auto, 500px 500px;
+  box-shadow:
+    inset 0 12px 22px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.45),
+    inset 0 -2px 0 rgba(255, 220, 170, 0.08);
+}
+
+.bin {
+  position: relative;
   list-style: none;
   margin: 0;
-  padding: 26px 12px 0;
+  padding: 36px 16px 0;
+  height: 176px;
   display: flex;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
-  scroll-snap-type: x proximity;
+  overflow-y: hidden;
   scrollbar-width: none;
+  scroll-snap-type: x proximity;
 }
-.row::-webkit-scrollbar {
+.bin::-webkit-scrollbar {
   display: none;
 }
-/* Centre the row without clipping the first sleeve when it overflows. */
-.row > li:first-child {
+.bin > li:first-child {
   margin-left: auto;
 }
-.row > li:last-child {
+.bin > li:last-child {
   margin-right: auto;
 }
 
-.item {
+.slot {
+  position: relative;
   flex: 0 0 auto;
   scroll-snap-align: center;
-}
-
-/* Per-record plank, only used when the shelf stands beside the deck. */
-.tier {
-  display: none;
 }
 
 .record {
   position: relative;
   display: block;
-  width: 120px;
+  width: 112px;
   height: 112px;
   padding: 0;
   border: 0;
@@ -57,29 +80,36 @@
   color: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .record:disabled {
   cursor: default;
 }
+.record:hover,
+.record:focus-visible {
+  transform: translateY(-10px);
+}
+.active {
+  transform: translateY(-22px);
+}
+.active:hover {
+  transform: translateY(-24px);
+}
 
 .sleeve {
   position: absolute;
-  left: 0;
-  bottom: 6px;
-  width: 100px;
-  height: 100px;
+  inset: 0;
+  z-index: 2;
   border-radius: 2px;
   background-color: var(--sleeve-bg);
   background-image: url("/textures/paper.svg");
   background-size: 200px 200px;
   overflow: hidden;
-  z-index: 2;
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.22),
     inset -8px 0 12px -8px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 8px 12px -5px rgba(0, 0, 0, 0.75);
-  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    -6px 10px 14px -6px rgba(0, 0, 0, 0.75);
 }
 .sleeve::after {
   content: "";
@@ -99,24 +129,12 @@
 .art {
   position: absolute;
   inset: 0;
-  padding: 10px 10px 9px;
+  padding: 9px 10px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 4px;
+  gap: 3px;
   text-align: left;
   color: var(--sleeve-ink);
-}
-.art::before {
-  content: "";
-  position: absolute;
-  top: 9px;
-  left: 9px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1.5px solid currentColor;
-  opacity: 0.55;
 }
 .artTitle {
   font-family: var(--font-display), Georgia, serif;
@@ -126,7 +144,7 @@
   line-height: 1.08;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   overflow: hidden;
 }
 .artArtist {
@@ -141,13 +159,30 @@
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
+.artRing {
+  position: absolute;
+  right: -14%;
+  bottom: -14%;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  opacity: 0.35;
+}
+.artRing::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
 
 .disc {
   position: absolute;
-  left: 4px;
-  bottom: 10px;
-  width: 92px;
-  height: 92px;
+  left: 9px;
+  top: 6px;
+  width: 94px;
+  height: 94px;
   border-radius: 50%;
   z-index: 1;
   background:
@@ -156,7 +191,7 @@
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .disc::after {
   content: "";
@@ -165,18 +200,12 @@
   border-radius: 50%;
   background: conic-gradient(from 200deg, transparent 0 15%, rgba(255, 255, 255, 0.1) 25%, transparent 35%);
 }
-
 .record:hover .disc,
-.record:focus-visible .disc,
+.record:focus-visible .disc {
+  transform: translateY(-14px) rotate(12deg);
+}
 .active .disc {
-  transform: translateX(24px) rotate(25deg);
-}
-.record:hover .sleeve,
-.record:focus-visible .sleeve {
-  transform: translateY(-4px);
-}
-.active .sleeve {
-  transform: translateY(-10px);
+  transform: translateY(-28px) rotate(20deg);
 }
 .record:focus-visible .sleeve {
   outline: 2px solid var(--cream);
@@ -185,10 +214,11 @@
 
 .tag {
   position: absolute;
-  left: 50px;
+  left: 50%;
   top: -14px;
   transform: translateX(-50%) rotate(-3deg);
   z-index: 3;
+  pointer-events: none;
   font-family: var(--font-type), "Courier New", monospace;
   font-size: 9px;
   letter-spacing: 0.22em;
@@ -203,75 +233,146 @@
   white-space: nowrap;
 }
 
-.plank {
-  height: 16px;
-  margin: 2px 6px 0;
-  border-radius: 3px;
-  background:
-    linear-gradient(rgba(255, 220, 170, 0.1), transparent 40%, rgba(0, 0, 0, 0.35)),
-    url("/textures/wood.svg");
-  background-size: auto, 600px 600px;
+.crateFront {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 56px;
+  z-index: 60;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
   background-color: var(--walnut-600);
+  background-image:
+    linear-gradient(rgba(255, 220, 170, 0.12), transparent 30%, rgba(0, 0, 0, 0.35)),
+    repeating-linear-gradient(180deg, transparent 0 17px, rgba(0, 0, 0, 0.35) 17px 19px),
+    url("/textures/wood.svg");
+  background-size: auto, auto, 600px 600px;
   box-shadow:
     inset 0 1px 0 rgba(255, 220, 170, 0.3),
-    0 10px 16px -4px rgba(0, 0, 0, 0.8);
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    -4px 12px 18px -6px rgba(0, 0, 0, 0.8);
+}
+.crateFront::before,
+.crateFront::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 8px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(255, 220, 170, 0.08));
+  border-radius: 2px;
+}
+.crateFront::before {
+  left: 6px;
+}
+.crateFront::after {
+  right: 6px;
+  transform: scaleX(-1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .sleeve,
-  .disc {
-    transition: none;
-  }
+.stencil {
+  font-family: var(--font-type), "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(241, 228, 200, 0.42);
+  border: 1px solid rgba(241, 228, 200, 0.22);
+  padding: 3px 9px 2px;
+  transform: rotate(-1.2deg);
+  white-space: nowrap;
 }
+
+/* ---- wide screens: a narrow crate beside the deck, records stepped behind each other ---- */
 
 @media (min-width: 880px) {
   .shelf {
     width: auto;
-    flex: 0 0 auto;
     max-height: calc(100dvh - 120px);
     display: flex;
     flex-direction: column;
   }
-  .shelfLabel {
-    margin-bottom: 10px;
-  }
-  .row {
-    flex-direction: column;
-    gap: 22px;
-    padding: 22px 10px 6px 6px;
-    overflow-x: visible;
+  .crate {
+    width: 212px;
+    padding: 0;
     overflow-y: auto;
-    scroll-snap-type: y proximity;
+    scrollbar-width: none;
   }
-  .row > li:first-child {
-    margin-left: 0;
+  .crate::-webkit-scrollbar {
+    display: none;
   }
-  .row > li:last-child {
-    margin-right: 0;
+  .crateBack {
+    top: 0;
   }
-  .item {
-    position: relative;
-    width: 150px;
-    scroll-snap-align: start;
+  .bin {
+    display: block;
+    padding: 0;
+    height: calc(206px + (var(--n) - 1) * 58px);
+    overflow: visible;
+  }
+  .bin > li:first-child,
+  .bin > li:last-child {
+    margin: 0;
+  }
+  .slot {
+    position: absolute;
+    left: 22px;
+    bottom: calc(14px + var(--i) * 58px);
   }
   .record {
-    margin: 0 auto 0 8px;
+    width: 168px;
+    height: 168px;
   }
-  .tier {
-    display: block;
-    height: 12px;
-    margin: 2px 0 0;
-    border-radius: 3px;
-    background:
-      linear-gradient(rgba(255, 220, 170, 0.1), transparent 40%, rgba(0, 0, 0, 0.35)),
-      url("/textures/wood.svg");
-    background-size: auto, 600px 600px;
-    background-color: var(--walnut-600);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 220, 170, 0.3),
-      0 10px 14px -4px rgba(0, 0, 0, 0.8);
+  .record:hover,
+  .record:focus-visible {
+    transform: translateY(-12px);
   }
-  .plank {
-    display: none;
+  .active {
+    transform: translateY(-18px);
+  }
+  .active:hover {
+    transform: translateY(-20px);
+  }
+  .artTitle {
+    font-size: 19px;
+  }
+  .artArtist {
+    font-size: 10px;
+  }
+  .disc {
+    left: 14px;
+    top: 10px;
+    width: 140px;
+    height: 140px;
+  }
+  .record:hover .disc,
+  .record:focus-visible .disc {
+    transform: translateY(-20px) rotate(12deg);
+  }
+  .active .disc {
+    transform: translateY(-40px) rotate(20deg);
+  }
+  .crateFront {
+    height: 86px;
+    bottom: -8px;
+  }
+  .crateFront::before,
+  .crateFront::after {
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+  }
+  .stencil {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .record,
+  .disc {
+    transition: none;
   }
 }

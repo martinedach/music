@@ -8,15 +8,7 @@ const BASE_GAIN = 0.11;
 const SECONDS_PER_REV = 1.8; // 33⅓ rpm
 const LOOP_SECONDS = SECONDS_PER_REV * 4;
 
-type AudioContextCtor = typeof AudioContext;
-
-function getContextCtor(): AudioContextCtor | null {
-  if (typeof window === "undefined") return null;
-  const w = window as Window & { webkitAudioContext?: AudioContextCtor };
-  return window.AudioContext ?? w.webkitAudioContext ?? null;
-}
-
-function buildBuffer(ctx: AudioContext): AudioBuffer {
+export function buildCrackleBuffer(ctx: BaseAudioContext): AudioBuffer {
   const rate = ctx.sampleRate;
   const length = Math.floor(LOOP_SECONDS * rate);
   const buffer = ctx.createBuffer(2, length, rate);
@@ -72,33 +64,27 @@ function buildBuffer(ctx: AudioContext): AudioBuffer {
   return buffer;
 }
 
+/** A looping crackle voice with its own filters and gain, feeding `out`. */
 export class Crackle {
-  private ctx: AudioContext | null = null;
   private buffer: AudioBuffer | null = null;
   private source: AudioBufferSourceNode | null = null;
   private gain: GainNode | null = null;
+  private rate = 1;
 
-  /** Create or resume the context. Call this from a user gesture. */
-  prime() {
-    if (!this.ctx) {
-      const Ctor = getContextCtor();
-      if (!Ctor) return;
-      this.ctx = new Ctor();
-    }
-    if (this.ctx.state === "suspended") void this.ctx.resume();
-  }
+  constructor(
+    private readonly ctx: AudioContext,
+    private readonly out: AudioNode,
+  ) {}
 
   start(volume: number) {
-    this.prime();
-    const ctx = this.ctx;
-    if (!ctx) return;
+    const { ctx } = this;
     this.stop(0.05);
-
-    this.buffer ??= buildBuffer(ctx);
+    this.buffer ??= buildCrackleBuffer(ctx);
 
     const source = ctx.createBufferSource();
     source.buffer = this.buffer;
     source.loop = true;
+    source.playbackRate.value = this.rate;
 
     const highpass = ctx.createBiquadFilter();
     highpass.type = "highpass";
@@ -112,7 +98,7 @@ export class Crackle {
     const gain = ctx.createGain();
     gain.gain.value = 0;
 
-    source.connect(highpass).connect(lowpass).connect(gain).connect(ctx.destination);
+    source.connect(highpass).connect(lowpass).connect(gain).connect(this.out);
     source.start();
     gain.gain.linearRampToValueAtTime(BASE_GAIN * volume, ctx.currentTime + 0.9);
 
@@ -121,13 +107,18 @@ export class Crackle {
   }
 
   setVolume(volume: number) {
-    if (!this.ctx || !this.gain) return;
-    this.gain.gain.setTargetAtTime(BASE_GAIN * volume, this.ctx.currentTime, 0.05);
+    this.gain?.gain.setTargetAtTime(BASE_GAIN * volume, this.ctx.currentTime, 0.05);
+  }
+
+  /** Speed the surface noise up or down with the platter. */
+  setRate(rate: number) {
+    this.rate = rate;
+    this.source?.playbackRate.setTargetAtTime(rate, this.ctx.currentTime, 0.25);
   }
 
   stop(fadeSeconds = 0.6) {
     const { ctx, source, gain } = this;
-    if (!ctx || !source || !gain) return;
+    if (!source || !gain) return;
     const now = ctx.currentTime;
     gain.gain.cancelScheduledValues(now);
     gain.gain.setValueAtTime(gain.gain.value, now);
