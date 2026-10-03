@@ -1,0 +1,277 @@
+.shelf {
+  width: 100%;
+  position: relative;
+}
+
+.shelfLabel {
+  font-family: var(--font-type), "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--cream-3);
+  margin: 0 0 18px;
+  opacity: 0.85;
+}
+
+.row {
+  list-style: none;
+  margin: 0;
+  padding: 26px 12px 0;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.row::-webkit-scrollbar {
+  display: none;
+}
+/* Centre the row without clipping the first sleeve when it overflows. */
+.row > li:first-child {
+  margin-left: auto;
+}
+.row > li:last-child {
+  margin-right: auto;
+}
+
+.item {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+}
+
+/* Per-record plank, only used when the shelf stands beside the deck. */
+.tier {
+  display: none;
+}
+
+.record {
+  position: relative;
+  display: block;
+  width: 120px;
+  height: 112px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.record:disabled {
+  cursor: default;
+}
+
+.sleeve {
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  width: 100px;
+  height: 100px;
+  border-radius: 2px;
+  background-color: var(--sleeve-bg);
+  background-image: url("/textures/paper.svg");
+  background-size: 200px 200px;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.22),
+    inset -8px 0 12px -8px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 8px 12px -5px rgba(0, 0, 0, 0.75);
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sleeve::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.14), transparent 40%, rgba(0, 0, 0, 0.12));
+  pointer-events: none;
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  padding: 10px 10px 9px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  text-align: left;
+  color: var(--sleeve-ink);
+}
+.art::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  opacity: 0.55;
+}
+.artTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.08;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.artArtist {
+  font-family: var(--font-type), "Courier New", monospace;
+  font-size: 9px;
+  line-height: 1.25;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.disc {
+  position: absolute;
+  left: 4px;
+  bottom: 10px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  z-index: 1;
+  background:
+    radial-gradient(circle, var(--cream-2) 0 15%, #111 15.5% 16.5%, transparent 17%),
+    repeating-radial-gradient(circle, #0b0b0b 0 1px, #1c1c1c 1px 2px);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transition: transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.disc::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg, transparent 0 15%, rgba(255, 255, 255, 0.1) 25%, transparent 35%);
+}
+
+.record:hover .disc,
+.record:focus-visible .disc,
+.active .disc {
+  transform: translateX(24px) rotate(25deg);
+}
+.record:hover .sleeve,
+.record:focus-visible .sleeve {
+  transform: translateY(-4px);
+}
+.active .sleeve {
+  transform: translateY(-10px);
+}
+.record:focus-visible .sleeve {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+
+.tag {
+  position: absolute;
+  left: 50px;
+  top: -14px;
+  transform: translateX(-50%) rotate(-3deg);
+  z-index: 3;
+  font-family: var(--font-type), "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--walnut-900);
+  background: linear-gradient(var(--brass-light), var(--brass));
+  padding: 3px 7px 2px;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 2px 4px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.plank {
+  height: 16px;
+  margin: 2px 6px 0;
+  border-radius: 3px;
+  background:
+    linear-gradient(rgba(255, 220, 170, 0.1), transparent 40%, rgba(0, 0, 0, 0.35)),
+    url("/textures/wood.svg");
+  background-size: auto, 600px 600px;
+  background-color: var(--walnut-600);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.3),
+    0 10px 16px -4px rgba(0, 0, 0, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sleeve,
+  .disc {
+    transition: none;
+  }
+}
+
+@media (min-width: 880px) {
+  .shelf {
+    width: auto;
+    flex: 0 0 auto;
+    max-height: calc(100dvh - 120px);
+    display: flex;
+    flex-direction: column;
+  }
+  .shelfLabel {
+    margin-bottom: 10px;
+  }
+  .row {
+    flex-direction: column;
+    gap: 22px;
+    padding: 22px 10px 6px 6px;
+    overflow-x: visible;
+    overflow-y: auto;
+    scroll-snap-type: y proximity;
+  }
+  .row > li:first-child {
+    margin-left: 0;
+  }
+  .row > li:last-child {
+    margin-right: 0;
+  }
+  .item {
+    position: relative;
+    width: 150px;
+    scroll-snap-align: start;
+  }
+  .record {
+    margin: 0 auto 0 8px;
+  }
+  .tier {
+    display: block;
+    height: 12px;
+    margin: 2px 0 0;
+    border-radius: 3px;
+    background:
+      linear-gradient(rgba(255, 220, 170, 0.1), transparent 40%, rgba(0, 0, 0, 0.35)),
+      url("/textures/wood.svg");
+    background-size: auto, 600px 600px;
+    background-color: var(--walnut-600);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 220, 170, 0.3),
+      0 10px 14px -4px rgba(0, 0, 0, 0.8);
+  }
+  .plank {
+    display: none;
+  }
+}

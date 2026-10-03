@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <defs>
+    <filter id="streaks" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.12" numOctaves="4" seed="3" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="
+        0 0 0 0 0.06
+        0 0 0 0 0.03
+        0 0 0 0 0.01
+        1.5 0 0 0 -0.5"/>
+    </filter>
+    <filter id="highlights" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="turbulence" baseFrequency="0.0022 0.05" numOctaves="2" seed="11" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="
+        0 0 0 0 0.96
+        0 0 0 0 0.74
+        0 0 0 0 0.44
+        1.6 0 0 0 -0.32"/>
+    </filter>
+    <filter id="fine" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.9" numOctaves="2" seed="5" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0 0
+        0.9 0 0 0 -0.3"/>
+    </filter>
+  </defs>
+  <rect width="900" height="900" fill="#4b2b17"/>
+  <rect width="900" height="900" filter="url(#highlights)" opacity="0.5"/>
+  <rect width="900" height="900" filter="url(#streaks)" opacity="0.7"/>
+  <rect width="900" height="900" filter="url(#fine)" opacity="0.35"/>
+</svg>
